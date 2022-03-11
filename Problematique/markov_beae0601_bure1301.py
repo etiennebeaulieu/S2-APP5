@@ -25,6 +25,8 @@
 import os
 import glob
 import ntpath
+from collections import OrderedDict
+
 
 class markov():
     """Classe Ã  utiliser pour coder la solution Ã  la problÃ©matique:
@@ -136,6 +138,7 @@ class markov():
         self.ngram = 1
 
         # Au besoin, ajouter votre code d'initialisation de l'objet de type markov lors de sa crÃ©ation
+        self.vectors = dict();
 
         return
 
@@ -158,7 +161,7 @@ class markov():
             resultats (Liste[(string,float)]) : Liste de tuples (auteurs, niveau de proximitÃ©), oÃ¹ la proximitÃ© est un nombre entre 0 et 1)
         """
 
-        resultats = [("balzac", 0.1234), ("voltaire", 0.1123)]   # Exemple du format des sorties
+        #resultats = [("balzac", 0.1234), ("voltaire", 0.1123)]   # Exemple du format des sorties
 
 
         # Ajouter votre code pour dÃ©terminer la proximitÃ© du fichier passÃ© en paramÃ¨tre avec chacun des auteurs
@@ -170,7 +173,33 @@ class markov():
         #   proximitÃ© = (A . B) / (|A| |B|)   oÃ¹ A est le vecteur du texte inconnu et B est celui d'un auteur,
         #           . est le produit scalaire, et |X| est la norme (longueur) du vecteur X
 
+        resultats = list();
+
+        vecteurOeuvre = self.analyzeOeuvre(oeuvre)
+
+
+        for auteur in self.auteurs:
+            resultats.append((auteur, self.proximite(vecteurOeuvre, self.vectors.get(auteur))))
+
+
         return resultats
+
+    def proximite(self, texteInconnu, texteConnu):
+
+        communInconnu = dict()
+        communConnu = dict()
+
+        for key, value in texteInconnu.items():
+            if texteConnu.__contains__(key):
+                communInconnu[key] = value
+
+        for key, value in texteConnu.items():
+            if texteInconnu.__contains__(key):
+                communConnu[key] = value
+
+
+        return float(sum(communInconnu[key]*communConnu.get(key, 0) for key in communInconnu)) / (len(communInconnu) * len(communConnu))
+
 
     def gen_text(self, auteur, taille, textname):
         """AprÃ¨s analyse des textes d'auteurs connus, produire un texte selon des statistiques d'un auteur
@@ -196,8 +225,20 @@ class markov():
         Returns:
             ngram (List[Liste[string]]) : Liste de liste de mots composant le n-gramme recherchÃ© (il est possible qu'il y ait plus d'un n-gramme au mÃªme rang)
         """
-        ngram = [['un', 'roman']]   # Exemple du format de sortie d'un bigramme
-        return ngram
+        listeGram = dict()
+        for gram in self.vectors.get(auteur):
+            if listeGram.__contains__(self.vectors.get(auteur).get(gram)):
+                listeGram.get(self.vectors.get(auteur).get(gram)).appends(gram)
+            else:
+                listeGram[self.vectors.get(auteur).get(gram)] = [gram]
+
+
+        listeGram = OrderedDict(sorted(listeGram, reverse=True))
+
+
+
+        #ngram = [['un', 'roman']]   # Exemple du format de sortie d'un bigramme
+        return listeGram.get(n)
 
 
     def analyze(self):
