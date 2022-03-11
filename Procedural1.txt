@@ -1,0 +1,94 @@
+7.1
+
+a)
+	Bonne analogie entre train et liste. Liste garde l'ordre du train.
+b)
+	1. train.next().next().next().next()
+	2. simplement chainé, se rendre au 6e wagon, next42 = next6, next6 = 42
+	3. next42 = next7
+
+7.2
+
+a)
+	clé, valeur, taille, tableau statique
+b)
+	fonction unidirectionnelle qui donne toujours la même réponse unique
+c)
+	Deux valeur qui ont le même index. Non évitable parce qu'il est impossible de savoir ce qui sera mis dans le tableau
+d) 
+	Chainage : ajout d'un deuxième niveau de stockage pour chaque valeur
+	Adressage ouvert : Ajout de la valeur avant, ou après, ou ailleurs
+	
+	Avantages : ouvert -> plus rapide, moins de mémoire
+	Inconvénients : ouvert -> si table pleine et élément inéxistant, infinite loop
+			2e niveau -> plus gourmand en mémoire
+
+e)
+	Ajout : N opérations
+	Accès : 1 opération
+
+7.3
+
+a)
+	assemblage de noeuds et de feuilles, arbre = 2D, liste = 1D
+b)
+	arbre dont chaque noeud a au max 2 enfants, trié par comparaison, à gauche <, à 	droite >
+c)
+						5
+					2		8
+				1	    4	      7		9
+					   3	     6			10
+
+
+	1
+	  2
+	    3
+	      4
+		5
+		  6
+		    7
+		      8
+			9
+			  10
+
+d)
+	Balancer l'arbre une fois de temps en temps
+
+7.4
+
+a)
+	O : worst case
+	Omega : best case
+	Theta : all cases
+b)
+	
+
+c)
+	O(n^2)
+
+d)
+	
+	O(1)		O(logn)		O(n)		O(n^2)		O(10^n)
+10^3
+N	1		3		10^3		10^6		10^1000
+T	10^-9s		3^-9s		10^-6s		10^-3s		10^991s
+
+10^6
+N	1		6		10^6		10^12		10^1000000
+T	10^-9s		6^-9s		10^-3s		10^3s		10^999991s
+
+10^9
+N	1		9		10^9		10^18		10^1000000000
+T	10^-9s		9^-9s		1s		10^9s		10^999999991s
+
+
+e)
+	1. O(n)
+	2. O(n^2)
+	3. O(n^2)
+	4. O(1)
+	5. O(logn)
+	6. O(n)
+
+
+
