@@ -25,7 +25,7 @@
 import os
 import glob
 import ntpath
-
+from pythonds3.graphs import Graph
 class markov():
     """Classe Ã  utiliser pour coder la solution Ã  la problÃ©matique:
 
@@ -42,7 +42,7 @@ class markov():
 
     # Le code qui suit est fourni pour vous faciliter la vie.  Il n'a pas Ã  Ãªtre modifiÃ©
     # Signes de ponctuation Ã  retirer (complÃ©ter la liste qui ne comprend que "!" et "," au dÃ©part)
-    PONC = ["!",","]
+    PONC = ["!","?",",",".",";",":","-","_","\"","«","»","(",")","\n","\'"]
 
     def set_ponc(self, value):
         """DÃ©termine si les signes de ponctuation sont conservÃ©s (True) ou Ã©liminÃ©s (False)
@@ -184,6 +184,12 @@ class markov():
             void : ne retourne rien, le texte produit doit Ãªtre Ã©crit dans le fichier "textname"
         """
 
+        #text
+
+        f = open(str(textname), encoding="utf8")
+        f.write(text)
+        f.close()
+
         return
 
     def get_nth_element(self, auteur, n):
@@ -209,6 +215,11 @@ class markov():
         Returns:
             void : ne retourne rien, toute l'information extraite est conservÃ©e dans des strutures internes
         """
+        for author in authorList:
+            books_path = os.path.normpath(path + "\\" + author)
+            books = os.listdir(books_path)
+            value =
+
 
         # Ajouter votre code ici pour traiter l'ensemble des oeuvres de l'ensemble des auteurs
         # Pour l'analyse:  faire le calcul des frÃ©quences de n-grammes pour l'ensemble des oeuvres
@@ -224,3 +235,21 @@ class markov():
         #   les mots d'une trÃ¨s longue oeuvre du mÃªme auteur. Ce n'est PAS ce qui vous est demandÃ© ici.
 
         return
+
+
+
+    def create_graph(self, aDict):
+        g = Graph()
+        for x in aDict:
+            first, second = x.split()
+            graph.addEdge(first, second, aDict[x])
+        return g
+
+    def generate_text(self,aDict, nb, mode):
+        text = ""
+        if mode == 1:
+            for index in range(0, aDict):
+               #text +
+
+
+    def read_all_books_author(self,path,):
