@@ -204,12 +204,31 @@ class markov():
 
     def create_graph(self, dictionary : dict):
         g = Graph()
-        for key,values in dictionary:
-            g.add_edge(key[0], key[1], values)
+        values = list(dictionary.values())
+        keys = list(dictionary.keys())
+        for i in range(0, len(keys)):
+            g.add_edge(keys[i][0], keys[i][1], values[i])
         return g
 
-    def get_next_vertex(self, graph : Graph, vertex):
-        test = graph.get_vertices()[vertex]
+    def get_next_vertex(self, g : Graph, v: str) -> str:
+
+        total = 0
+        vertex = g.get_vertex(v)
+
+        for voisin in vertex.get_neighbors():
+            edge = (vertex.key, voisin.key)
+            total += g._edges[edge]
+
+
+        if total == 0:
+            return list(g.get_vertices())[randint(0, len(g.get_vertices()))]
+
+        rand = randint(0, total)
+        for voisin in vertex.get_neighbors():
+            rand -=vertex.get_neighbor(voisin)
+            if rand <=0:
+                return voisin.get_key()
+
     def gen_text(self, auteur, taille, textname):
         """AprÃ¨s analyse des textes d'auteurs connus, produire un texte selon des statistiques d'un auteur
 
@@ -222,36 +241,26 @@ class markov():
             void : ne retourne rien, le texte produit doit Ãªtre Ã©crit dans le fichier "textname"
         """
         
-        style = sorted(self.vectors.get(auteur), key=self.vectors.get(auteur).get, reverse=True)
-        graph = self.create_graph(self.vectors.get(auteur))
-        vertex = graph.get_vertices()[random.randint(0, len(graph.get_vertices()))]
 
-        for i in range(0,taille):
+        text = ""
 
 
+        # Est-ce possible de générer un texte pour ngram =1 et comment créer graph pour ngram > 2
         if self.ngram == 1:
-            text = "Pas assez d'informations pour générer un texte"
+            text += "Pas assez d'informations pour générer un texte"
         else:
-            text: str = ' '.join(style[0][0:2])
-            print(text)
-            for i in range(2, taille):
-                lastWord = text.split()[-1]
-                j = 0
-                found = False
-                while j < len(style) and not found:
-                    if style[j][0] == lastWord and not style[j][1] == text.split()[-2]:
-                        text += " " + ' '.join(style[j][1:2])
-                        found = True
-                    j += 1
-                if not found:
-                    break
+             graph = self.create_graph(self.vectors.get(auteur))
+             vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
+             text += vertex
+             for i in range(0, taille):
+                 vertex = self.get_next_vertex(graph, vertex)
+                 text += " " + str(vertex)
 
 
         f = open(str(textname), "w+", encoding="utf8")
         f.write(text)
         f.close()
 
-        return
 
     def get_nth_element(self, auteur, n):
         """AprÃ¨s analyse des textes d'auteurs connus, retourner le n-iÃ¨me plus frÃ©quent n-gramme de l'auteur indiquÃ©
@@ -266,7 +275,7 @@ class markov():
         listeGram = dict()
         for gram in self.vectors.get(auteur):
             if listeGram.__contains__(self.vectors.get(auteur).get(gram)):
-                listeGram.get(self.vectors.get(auteur).get(gram)).appends(gram)
+                listeGram.get(self.vectors.get(auteur).get(gram)).append(gram)
             else:
                 listeGram[self.vectors.get(auteur).get(gram)] = [gram]
 
