@@ -247,6 +247,38 @@ class markov():
         #ngram = [['un', 'roman']]   # Exemple du format de sortie d'un bigramme
         return listeGram.get(n)
 
+    def read_author(self, oeuvre, auteur):
+        file = open(oeuvre, "r")
+        for line in file.readlines():
+            line.lower()
+            if self.keep_ponc:
+                for words in line.split():
+                    wordsList += words
+            else:
+                for words in line.split():
+                    for characters in self.PONC:
+                        words.replace(characters, "")
+                    wordsList += words
+
+        for i in range(0, len(wordsList) - self.ngram):
+            words = self.vectors.get(auteur)[wordsList[i:i + self.ngram - 1]]
+            if words in dictionnary:
+                words += count
+            else:
+                words = count
+        file.close()
+        # if self.ngram == 1:
+        #     for word in wordsList:
+        #         add_word_to_author(word)
+        # elif self.ngram == 2:
+        #     for word in wordsList:
+        #         wordsList[1]
+
+    def add_word_to_author(self, word, count):
+        if word in dict:
+            dict[word] += count
+        else:
+            dict[word] = count
 
     def analyze(self):
         """Fait l'analyse des textes fournis, en traitant chaque oeuvre de chaque auteur
@@ -257,10 +289,17 @@ class markov():
         Returns:
             void : ne retourne rien, toute l'information extraite est conservÃ©e dans des strutures internes
         """
+        print("yo")
+        for auteur in self.auteurs:
+            list_oeuvre_auteur = get_aut_files(auteur)
+            for oeuvre in list_oeuvre_auteur:
+                read_author(oeuvre, auteur)
+
+
 
 
         # Ajouter votre code ici pour traiter l'ensemble des oeuvres de l'ensemble des auteurs
-        # Pour l'analyse:  faire le calcul des frÃ©quences de n-grammes pour l'ensemble des oeuvres
+        # Pour l'analyse:  faire le calcul des frÃ©quences de n-gralmmes pour 'ensemble des oeuvres
         #   d'un certain auteur, sans distinction des oeuvres individuelles,
         #       et recommencer ce calcul pour chacun des auteurs
         #   En procÃ©dant ainsi, les oeuvres comprenant plus de mots auront un impact plus grand sur
