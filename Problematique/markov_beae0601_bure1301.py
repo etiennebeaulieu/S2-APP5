@@ -25,6 +25,7 @@
 import os
 import glob
 import ntpath
+from random import random
 
 from pythonds3.graphs import Graph
 from collections import OrderedDict
@@ -185,7 +186,7 @@ class markov():
 
         return resultats
 
-    def proximite(self, texteInconnu, texteConnu):
+    def proximite(self, texteInconnu: dict, texteConnu: dict):
 
         communInconnu = dict()
         communConnu = dict()
@@ -213,8 +214,26 @@ class markov():
         Returns:
             void : ne retourne rien, le texte produit doit Ãªtre Ã©crit dans le fichier "textname"
         """
+        
+        style = sorted(self.vectors.get(auteur), reverse=True)
 
-        #text
+        if self.ngram == 1:
+            text = "Pas assez d'informations pour générer un texte"
+        else:
+            text: str = ' '.join(style[0][0:1])
+
+            for i in range(2, taille/2):
+                lastWord = text.split()[-1]
+                j = 0
+                found = False
+                while j < len(style) and not found:
+                    if style[j][0] == lastWord:
+                        text += ' '.join(style[j][0:1])
+                        found = True
+
+                if not found:
+                    break
+
 
         f = open(str(textname), encoding="utf8")
         f.write(text)
