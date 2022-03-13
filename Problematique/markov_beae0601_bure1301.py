@@ -25,7 +25,7 @@
 import os
 import glob
 import ntpath
-from random import random
+from random import random, randint
 
 from pythonds3.graphs import Graph
 from collections import OrderedDict
@@ -46,7 +46,7 @@ class markov():
 
     # Le code qui suit est fourni pour vous faciliter la vie.  Il n'a pas Ã  Ãªtre modifiÃ©
     # Signes de ponctuation Ã  retirer (complÃ©ter la liste qui ne comprend que "!" et "," au dÃ©part)
-    PONC = ["!","?",",",".",";",":","-","_","\"","«","»","(",")","\n","\'"]
+    PONC = ["!","?",",",".",";",":","_","\"","«","»","(",")","\n","\'","—"]
 
     def set_ponc(self, value):
         """DÃ©termine si les signes de ponctuation sont conservÃ©s (True) ou Ã©liminÃ©s (False)
@@ -202,7 +202,14 @@ class markov():
 
         return float(sum(communInconnu[key]*communConnu.get(key, 0) for key in communInconnu)) / (len(communInconnu) * len(communConnu))
 
+    def create_graph(self, dictionary : dict):
+        g = Graph()
+        for key,values in dictionary:
+            g.add_edge(key[0], key[1], values)
+        return g
 
+    def get_next_vertex(self, graph : Graph, vertex):
+        test = graph.get_vertices()[vertex]
     def gen_text(self, auteur, taille, textname):
         """AprÃ¨s analyse des textes d'auteurs connus, produire un texte selon des statistiques d'un auteur
 
@@ -215,27 +222,32 @@ class markov():
             void : ne retourne rien, le texte produit doit Ãªtre Ã©crit dans le fichier "textname"
         """
         
-        style = sorted(self.vectors.get(auteur), reverse=True)
+        style = sorted(self.vectors.get(auteur), key=self.vectors.get(auteur).get, reverse=True)
+        graph = self.create_graph(self.vectors.get(auteur))
+        vertex = graph.get_vertices()[random.randint(0, len(graph.get_vertices()))]
+
+        for i in range(0,taille):
+
 
         if self.ngram == 1:
             text = "Pas assez d'informations pour générer un texte"
         else:
-            text: str = ' '.join(style[0][0:1])
-
-            for i in range(2, taille/2):
+            text: str = ' '.join(style[0][0:2])
+            print(text)
+            for i in range(2, taille):
                 lastWord = text.split()[-1]
                 j = 0
                 found = False
                 while j < len(style) and not found:
-                    if style[j][0] == lastWord:
-                        text += ' '.join(style[j][0:1])
+                    if style[j][0] == lastWord and not style[j][1] == text.split()[-2]:
+                        text += " " + ' '.join(style[j][1:2])
                         found = True
-
+                    j += 1
                 if not found:
                     break
 
 
-        f = open(str(textname), encoding="utf8")
+        f = open(str(textname), "w+", encoding="utf8")
         f.write(text)
         f.close()
 
@@ -267,37 +279,28 @@ class markov():
         return listeGram.get(n)
 
     def read_author(self, oeuvre, auteur):
-        file = open(oeuvre, "r")
+        wordsList : list = []
+        file = open(oeuvre, "r", encoding="utf8")
         for line in file.readlines():
-            line.lower()
-            if self.keep_ponc:
-                for words in line.split():
-                    wordsList += words
+            line = line.lower()
+            if  self.keep_ponc:
+                wordline = line.split()
+                for words in wordline:
+                    wordsList.append(words)
             else:
-                for words in line.split():
-                    for characters in self.PONC:
-                        words.replace(characters, "")
-                    wordsList += words
-
+                for characters in self.PONC:
+                    line = line.replace(characters, "")
+                line = line.replace("-", " ")
+                wordline = line.split()
+                for words in wordline:
+                    wordsList.append(words)
         for i in range(0, len(wordsList) - self.ngram):
-            words = self.vectors.get(auteur)[wordsList[i:i + self.ngram - 1]]
-            if words in dictionnary:
-                words += count
+            words = tuple(wordsList[i:i + self.ngram])
+            if words in self.vectors.get(auteur):
+                self.vectors[auteur][words] += 1
             else:
-                words = count
+                self.vectors[auteur][words] = 1
         file.close()
-        # if self.ngram == 1:
-        #     for word in wordsList:
-        #         add_word_to_author(word)
-        # elif self.ngram == 2:
-        #     for word in wordsList:
-        #         wordsList[1]
-
-    def add_word_to_author(self, word, count):
-        if word in dict:
-            dict[word] += count
-        else:
-            dict[word] = count
 
     def analyze(self):
         """Fait l'analyse des textes fournis, en traitant chaque oeuvre de chaque auteur
@@ -308,14 +311,11 @@ class markov():
         Returns:
             void : ne retourne rien, toute l'information extraite est conservÃ©e dans des strutures internes
         """
-        print("yo")
         for auteur in self.auteurs:
-            list_oeuvre_auteur = get_aut_files(auteur)
+            self.vectors[auteur] = dict()
+            list_oeuvre_auteur = self.get_aut_files(auteur)
             for oeuvre in list_oeuvre_auteur:
-                read_author(oeuvre, auteur)
-
-
-
+                self.read_author(oeuvre, auteur)
 
         # Ajouter votre code ici pour traiter l'ensemble des oeuvres de l'ensemble des auteurs
         # Pour l'analyse:  faire le calcul des frÃ©quences de n-gralmmes pour 'ensemble des oeuvres
