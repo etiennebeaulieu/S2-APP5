@@ -1,0 +1,40 @@
+Dictionnaire des auteurs
+dictionnaire {string, dictionnaire} : 	key=nom auteur
+					value=vecteur de l'auteur
+
+Vecteur auteur:
+dictionnaire {tuple, int}	key=n-gram
+				value=fréquence
+
+
+n-gram
+tuple (string, string, ... , string)	element=mot
+
+
+
+generation de texte
+graph:
+	vertex=mot
+	edge=fréquence de ce bigrame
+		
+
+
+Explication des choix:
+dictionnaire des auteurs
+	Permet de facilement expand le code pour plus d'auteur, en masse de mémoire sur les ordi moderne pour se permettre d'utiliser le dictionnaire. O(1) pour rechercher le vecteur de l'auteur (puisque seulement 6 éléments, pas de collision importantes donc on peut prendre pour acquis que c'est toujours O(1))
+
+vecteur auteur
+	Simplicité d'utilisation pour avoir des mots comme clé d'accès et la fréquence comme donné. Beaucoup plus simple à implémenter que de faire une classe objet pour avoir ces infos. En moyenne O(1) pour recherché la fréquence d'un n-gram car dictionnaire python est un tableau de hachage bien optimisé
+
+
+n-gram
+	Devait pouvoir facilement s'adapter pour n mot. Devait être immutable pour être une clé de dictionnaire donc list n'était pas possible. Compléxité de recherche n'est pas importante car il n'y a pas de recherche à faire. Complexité d'accès O(1)
+
+
+génération de text
+	Permet de voir tous les mots qui peuvent venir après un certain mot en regardant les voisins d'un vertex en particulier et aussi connaitre leur probabilité en regardant le poids du edge entre-eux
+
+
+list:
+nom_auteurs
+fichiers_auteur

@@ -141,7 +141,7 @@ class markov():
         self.ngram = 1
 
         # Au besoin, ajouter votre code d'initialisation de l'objet de type markov lors de sa crÃ©ation
-        self.vectors = dict();
+        self.vectors: {str, {tuple, int}} = dict()
 
         return
 
@@ -176,7 +176,7 @@ class markov():
         #   proximitÃ© = (A . B) / (|A| |B|)   oÃ¹ A est le vecteur du texte inconnu et B est celui d'un auteur,
         #           . est le produit scalaire, et |X| est la norme (longueur) du vecteur X
 
-        resultats = list();
+        resultats = list()
 
         vecteurOeuvre = self.analyzeOeuvre(oeuvre)
 
@@ -259,33 +259,40 @@ class markov():
         if auteur == "A":
             for auteur in self.auteurs:
                 text += auteur + ":: Début:\n"
-        # Est-ce possible de générer un texte pour ngram =1 et comment créer graph pour ngram > 2
-                if self.ngram == 1:
-                    text += "Pas assez d'informations pour générer un texte"
-                else:
-                    graph = self.create_graph(self.vectors.get(auteur))
-                    vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
-                    text += vertex
-                    for i in range(0, taille):
-                        vertex = self.get_next_vertex(graph, vertex)
-                        text += " " + str(vertex)
+                text += self.generateText(auteur, taille)
                 text += "\n" + auteur + "::Fin\n\n"
         else:
-            if self.ngram == 1:
-                text += "Pas assez d'informations pour générer un texte"
-            else:
-                graph = self.create_graph(self.vectors.get(auteur))
-                vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
-                text += vertex
-                for i in range(0, taille):
-                    vertex = self.get_next_vertex(graph, vertex)
-                    text += " " + str(vertex)
+            text += self.generateText(auteur, taille)
 
         f = open(str(textname), "w+", encoding="utf8")
         f.write(text)
         f.close()
 
+    def generateText(self, auteur, taille):
+        text = ""
+        if self.ngram == 1:
+            words = dict()
+            sortedList = (sorted(self.vectors.get(auteur), key=self.vectors.get(auteur).get))
+            total = sum(self.vectors.get(auteur).values())
+            for key, value in self.vectors.get(auteur).items():
+               words[key] = value/total
 
+            for i in range(0, taille):
+                rand = random()
+                for word in sortedList:
+                    rand -= words[word]
+                    if rand <= 0:
+                        text += word[0] + " "
+                        break
+        else:
+            graph = self.create_graph(self.vectors.get(auteur))
+            vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
+            text += vertex
+            for i in range(0, taille):
+                vertex = self.get_next_vertex(graph, vertex)
+                text += " " + str(vertex)
+
+        return text
     def get_nth_element(self, auteur, n):
         """AprÃ¨s analyse des textes d'auteurs connus, retourner le n-iÃ¨me plus frÃ©quent n-gramme de l'auteur indiquÃ©
 
