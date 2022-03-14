@@ -11,7 +11,7 @@ import argparse
 import importlib
 import sys
 
-import markov_beae0601_bure1301 as markov
+import markov_CIP1_CIP2 as markov
 
 
 class TestMarkov():
@@ -50,6 +50,7 @@ class TestMarkov():
 
             if self.args.noPonc:
                 print("Retirer les signes de ponctuation")
+                self.markov.print_ponc()
                 self.markov.print_ponc()
             else:
                 print("Conserver les signes de ponctuation")

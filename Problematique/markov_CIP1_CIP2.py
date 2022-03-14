@@ -189,27 +189,30 @@ class markov():
 
     def proximite(self, texteInconnu: dict, texteConnu: dict):
 
-        communInconnu = dict()
-        communConnu = dict()
-        totalOccurenceCommun = 0
+        totalOccurenceConnu = 0
         totalOccurenceInconnu = 0
 
+
         for key, value in texteInconnu.items():
-            if texteConnu.__contains__(key):
-                communInconnu[key] = value
-                totalOccurenceInconnu += value
+            totalOccurenceInconnu += value**2
 
         for key, value in texteConnu.items():
-            if texteInconnu.__contains__(key):
-                communConnu[key] = value
-                totalOccurenceCommun += value
+            totalOccurenceConnu += value**2
 
+
+
+
+        totalOccurenceConnu = sqrt(totalOccurenceConnu)
+        totalOccurenceInconnu = sqrt(totalOccurenceInconnu)
         val = 0
-        for key in communInconnu:
-            val += ((communConnu[key] / totalOccurenceCommun - communInconnu[key] / totalOccurenceInconnu)*(communConnu[key] / totalOccurenceCommun - communInconnu[key] / totalOccurenceInconnu))
+        for key in texteConnu:
+            if key in texteInconnu:
+                inconnu = texteConnu[key]/totalOccurenceInconnu
+                connu = texteInconnu[key]/totalOccurenceConnu
+                val += inconnu * connu
 
 
-        return sqrt(val)
+        return val
 
 
     def create_graph(self, dictionary : dict):
@@ -255,17 +258,17 @@ class markov():
         text = ""
         if auteur == "A":
             for auteur in self.auteurs:
-                text+= auteur + ":: Début:\n"
+                text += auteur + ":: Début:\n"
         # Est-ce possible de générer un texte pour ngram =1 et comment créer graph pour ngram > 2
                 if self.ngram == 1:
                     text += "Pas assez d'informations pour générer un texte"
                 else:
-                     graph = self.create_graph(self.vectors.get(auteur))
-                     vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
-                     text += vertex
-                     for i in range(0, taille):
-                         vertex = self.get_next_vertex(graph, vertex)
-                         text += " " + str(vertex)
+                    graph = self.create_graph(self.vectors.get(auteur))
+                    vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
+                    text += vertex
+                    for i in range(0, taille):
+                        vertex = self.get_next_vertex(graph, vertex)
+                        text += " " + str(vertex)
                 text += "\n" + auteur + "::Fin\n\n"
         else:
             if self.ngram == 1:
@@ -313,7 +316,7 @@ class markov():
         file = open(oeuvre, "r", encoding="utf8")
         for line in file.readlines():
             line = line.lower()
-            if  self.keep_ponc:
+            if self.keep_ponc:
                 wordline = line.split()
                 for words in wordline:
                     if len(words) > 2:
@@ -348,8 +351,8 @@ class markov():
                         wordsList.append(words)
             else:
                 for characters in self.PONC:
-                    line = line.replace(characters, " ")
-                line = line.replace("-", " ")
+                    line = line.replace(characters, "")
+                line = line.replace("-", "")
                 wordline = line.split()
                 for words in wordline:
                     if len(words) > 2:
