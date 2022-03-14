@@ -1,14 +1,14 @@
 Dictionnaire des auteurs
-dictionnaire {string, dictionnaire} : 	key=nom auteur
-					value=vecteur de l'auteur
+dictionnaire {string, dictionnaire} : 			key=nom auteur
+							value=vecteur de l'auteur
 
 Vecteur auteur:
-dictionnaire {tuple, int}	key=n-gram
-				value=fréquence
+dictionnaire {tuple, int}				key=n-gram
+							value=fréquence
 
 
 n-gram
-tuple (string, string, ... , string)	element=mot
+tuple (string, string, ... , string)			element=mot
 
 
 
@@ -66,4 +66,5 @@ O(nlog(n)) ---- Timsort de python pour ordonner le dictionnaire en fonction des 
 
 QUESTION RAPPORT :
 Évaluation compléxité pour ajout des mot???
+À quel point description des structures de données
 Nomenclature fichiers
