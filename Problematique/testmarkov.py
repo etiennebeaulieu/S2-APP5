@@ -11,7 +11,7 @@ import argparse
 import importlib
 import sys
 
-import markov_CIP1_CIP2 as markov
+import markov_beae0601_bure1301 as markov
 
 
 class TestMarkov():
@@ -50,7 +50,6 @@ class TestMarkov():
 
             if self.args.noPonc:
                 print("Retirer les signes de ponctuation")
-                self.markov.print_ponc()
                 self.markov.print_ponc()
             else:
                 print("Conserver les signes de ponctuation")
@@ -106,7 +105,7 @@ class TestMarkov():
         parser.add_argument('-g_sep', default="_", help='Utiliser cette chaine de caractÃ¨res comme sÃ©parateur dans le nom de fichier gÃ©nÃ©reÃ©')
         parser.add_argument('-v', action='store_true', help='Mode verbose')
         parser.add_argument('-noPonc', action='store_true', help='Retirer la ponctuation')
-        parser.add_argument('-rep_code', default='.', help='RÃ©pertoire contenant la liste des CIPs et le code markov_CIP1_CIP2.py')
+        parser.add_argument('-rep_code', default='.', help='RÃ©pertoire contenant la liste des CIPs et le code markov_beae0601_bure1301.py')
         parser.add_argument('-R', help='Nom du fichier de statistiques destinÃ© Ã  R')
         self.args = parser.parse_args()
 
@@ -163,7 +162,7 @@ class TestMarkov():
         return
 
     def import_markov_cip(self, cip):
-        """Importe le fichier markov_CIP1_CIP2.py, oÃ¹ "CIP1_CIP2" est passÃ© dans le paramÃ¨tre cip
+        """Importe le fichier markov_beae0601_bure1301.py, oÃ¹ "CIP1_CIP2" est passÃ© dans le paramÃ¨tre cip
 
         Args:
             cip (string): Contient "CIP1_CIP2", les cips pour le code Ã  tester
