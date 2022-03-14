@@ -25,6 +25,7 @@
 import os
 import glob
 import ntpath
+from math import sqrt
 from random import random, randint
 
 from pythonds3.graphs import Graph
@@ -190,17 +191,26 @@ class markov():
 
         communInconnu = dict()
         communConnu = dict()
+        totalOccurenceCommun = 0
+        totalOccurenceInconnu = 0
 
         for key, value in texteInconnu.items():
             if texteConnu.__contains__(key):
                 communInconnu[key] = value
+                totalOccurenceInconnu += value
 
         for key, value in texteConnu.items():
             if texteInconnu.__contains__(key):
                 communConnu[key] = value
+                totalOccurenceCommun += value
+
+        val = 0
+        for key in communInconnu:
+            val += ((communConnu[key] / totalOccurenceCommun - communInconnu[key] / totalOccurenceInconnu)*(communConnu[key] / totalOccurenceCommun - communInconnu[key] / totalOccurenceInconnu))
 
 
-        return float(sum(communInconnu[key]*communConnu.get(key, 0) for key in communInconnu)) / (len(communInconnu) * len(communConnu))
+        return sqrt(val)
+
 
     def create_graph(self, dictionary : dict):
         g = Graph()
@@ -243,19 +253,30 @@ class markov():
         
 
         text = ""
-
-
+        if auteur == "A":
+            for auteur in self.auteurs:
+                text+= auteur + ":: Début:\n"
         # Est-ce possible de générer un texte pour ngram =1 et comment créer graph pour ngram > 2
-        if self.ngram == 1:
-            text += "Pas assez d'informations pour générer un texte"
+                if self.ngram == 1:
+                    text += "Pas assez d'informations pour générer un texte"
+                else:
+                     graph = self.create_graph(self.vectors.get(auteur))
+                     vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
+                     text += vertex
+                     for i in range(0, taille):
+                         vertex = self.get_next_vertex(graph, vertex)
+                         text += " " + str(vertex)
+                text += "\n" + auteur + "::Fin\n\n"
         else:
-             graph = self.create_graph(self.vectors.get(auteur))
-             vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
-             text += vertex
-             for i in range(0, taille):
-                 vertex = self.get_next_vertex(graph, vertex)
-                 text += " " + str(vertex)
-
+            if self.ngram == 1:
+                text += "Pas assez d'informations pour générer un texte"
+            else:
+                graph = self.create_graph(self.vectors.get(auteur))
+                vertex: str = list(graph.get_vertices())[randint(0, len(graph.get_vertices()))]
+                text += vertex
+                for i in range(0, taille):
+                    vertex = self.get_next_vertex(graph, vertex)
+                    text += " " + str(vertex)
 
         f = open(str(textname), "w+", encoding="utf8")
         f.write(text)
@@ -272,7 +293,7 @@ class markov():
         Returns:
             ngram (List[Liste[string]]) : Liste de liste de mots composant le n-gramme recherchÃ© (il est possible qu'il y ait plus d'un n-gramme au mÃªme rang)
         """
-        listeGram = dict()
+        listeGram: {int, []}= dict()
         for gram in self.vectors.get(auteur):
             if listeGram.__contains__(self.vectors.get(auteur).get(gram)):
                 listeGram.get(self.vectors.get(auteur).get(gram)).append(gram)
@@ -280,12 +301,12 @@ class markov():
                 listeGram[self.vectors.get(auteur).get(gram)] = [gram]
 
 
-        listeGram = OrderedDict(sorted(listeGram, reverse=True))
-
+        listeGram = OrderedDict(sorted(((int(key), value) for key, value in listeGram.items()), reverse=True))
+        classement = list(listeGram.values())
 
 
         #ngram = [['un', 'roman']]   # Exemple du format de sortie d'un bigramme
-        return listeGram.get(n)
+        return classement[n-1]
 
     def read_author(self, oeuvre, auteur):
         wordsList : list = []
@@ -295,14 +316,16 @@ class markov():
             if  self.keep_ponc:
                 wordline = line.split()
                 for words in wordline:
-                    wordsList.append(words)
+                    if len(words) > 2:
+                        wordsList.append(words)
             else:
                 for characters in self.PONC:
-                    line = line.replace(characters, "")
+                    line = line.replace(characters, " ")
                 line = line.replace("-", " ")
                 wordline = line.split()
                 for words in wordline:
-                    wordsList.append(words)
+                    if len(words) > 2:
+                        wordsList.append(words)
         for i in range(0, len(wordsList) - self.ngram):
             words = tuple(wordsList[i:i + self.ngram])
             if words in self.vectors.get(auteur):
@@ -311,6 +334,35 @@ class markov():
                 self.vectors[auteur][words] = 1
         file.close()
 
+
+    def analyzeOeuvre(self, oeuvre) -> dict:
+        wordsList: list = []
+        vector = dict()
+        file = open(oeuvre, "r", encoding="utf8")
+        for line in file.readlines():
+            line = line.lower()
+            if self.keep_ponc:
+                wordline = line.split()
+                for words in wordline:
+                    if len(words) > 2:
+                        wordsList.append(words)
+            else:
+                for characters in self.PONC:
+                    line = line.replace(characters, " ")
+                line = line.replace("-", " ")
+                wordline = line.split()
+                for words in wordline:
+                    if len(words) > 2:
+                        wordsList.append(words)
+        for i in range(0, len(wordsList) - self.ngram):
+            words = tuple(wordsList[i:i + self.ngram])
+            if words in vector:
+                vector[words] += 1
+            else:
+                vector[words] = 1
+        file.close()
+
+        return vector
     def analyze(self):
         """Fait l'analyse des textes fournis, en traitant chaque oeuvre de chaque auteur
 
