@@ -205,8 +205,8 @@ class markov():
         totalOccurenceConnu = sqrt(totalOccurenceConnu)
         totalOccurenceInconnu = sqrt(totalOccurenceInconnu)
         val = 0
-        for key in texteConnu:
-            if key in texteInconnu:
+        for key in texteInconnu:
+            if key in texteConnu:
                 inconnu = texteConnu[key]/totalOccurenceInconnu
                 connu = texteInconnu[key]/totalOccurenceConnu
                 val += inconnu * connu
@@ -303,7 +303,7 @@ class markov():
         Returns:
             ngram (List[Liste[string]]) : Liste de liste de mots composant le n-gramme recherchÃ© (il est possible qu'il y ait plus d'un n-gramme au mÃªme rang)
         """
-        listeGram: {int, []}= dict()
+        listeGram: {int, []} = dict()
         for gram in self.vectors.get(auteur):
             if listeGram.__contains__(self.vectors.get(auteur).get(gram)):
                 listeGram.get(self.vectors.get(auteur).get(gram)).append(gram)
@@ -320,22 +320,23 @@ class markov():
 
     def read_author(self, oeuvre, auteur):
         wordsList : list = []
+        line = ""
         file = open(oeuvre, "r", encoding="utf8")
-        for line in file.readlines():
-            line = line.lower()
-            if self.keep_ponc:
-                wordline = line.split()
-                for words in wordline:
-                    if len(words) > 2:
-                        wordsList.append(words)
-            else:
-                for characters in self.PONC:
-                    line = line.replace(characters, " ")
-                line = line.replace("-", " ")
-                wordline = line.split()
-                for words in wordline:
-                    if len(words) > 2:
-                        wordsList.append(words)
+        for x in file.readlines():
+            line += x.lower()
+        if self.keep_ponc:
+            wordline = line.split()
+            for words in wordline:
+                if len(words) > 2:
+                    wordsList.append(words)
+        else:
+            for characters in self.PONC:
+                line = line.replace(characters, " ")
+            line = line.replace("-", " ")
+            wordline = line.split()
+            for words in wordline:
+                if len(words) > 2:
+                    wordsList.append(words)
         for i in range(0, len(wordsList) - self.ngram):
             words = tuple(wordsList[i:i + self.ngram])
             if words in self.vectors.get(auteur):
@@ -348,22 +349,23 @@ class markov():
     def analyzeOeuvre(self, oeuvre) -> dict:
         wordsList: list = []
         vector = dict()
+        line = ""
         file = open(oeuvre, "r", encoding="utf8")
-        for line in file.readlines():
-            line = line.lower()
-            if self.keep_ponc:
-                wordline = line.split()
-                for words in wordline:
-                    if len(words) > 2:
-                        wordsList.append(words)
-            else:
-                for characters in self.PONC:
-                    line = line.replace(characters, "")
-                line = line.replace("-", "")
-                wordline = line.split()
-                for words in wordline:
-                    if len(words) > 2:
-                        wordsList.append(words)
+        for x in file.readlines():
+            line += x.lower()
+        if self.keep_ponc:
+            wordline = line.split()
+            for words in wordline:
+                if len(words) > 2:
+                    wordsList.append(words)
+        else:
+            for characters in self.PONC:
+                line = line.replace(characters, "")
+            line = line.replace("-", "")
+            wordline = line.split()
+            for words in wordline:
+                if len(words) > 2:
+                    wordsList.append(words)
         for i in range(0, len(wordsList) - self.ngram):
             words = tuple(wordsList[i:i + self.ngram])
             if words in vector:

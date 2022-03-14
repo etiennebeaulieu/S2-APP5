@@ -38,3 +38,32 @@ génération de text
 list:
 nom_auteurs
 fichiers_auteur
+
+
+
+
+
+COMPLEXITÉ:
+
+Analyser 1 texte :
+O(n) ---- Parcourir tous les n-gram du texte
+
+Générer 1 texte :
+Unigram : O(nlog(n)) ---- Timsort de python pour ordonner le dictionnaire en fonction des fréquences
+n-gram : O(n) ---- Parcourir dictionnaire pour générer graph
+
+Trouver auteur :
+O(n) ---- Parcourir le dictionnaire pour noramliser le vecteur
+
+Get n-th element :
+O(nlog(n)) ---- Timsort de python pour ordonner le dictionnaire en fonction des fréquences
+
+
+
+
+
+
+
+QUESTION RAPPORT :
+Évaluation compléxité pour ajout des mot???
+Nomenclature fichiers
